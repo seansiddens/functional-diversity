@@ -28,7 +28,7 @@ print('Shapefile loaded in', round(time.time() - start_time, 2), 'seconds')
 
 # Initialize dataframe for site-species matrix.
 species = ["_".join(os.path.basename(raster_path).split('.')[0].split('_')[:2]) for raster_path in rasters_to_process]
-site_species_matrix = pd.DataFrame(index=hexagons.index, columns=species, data=0)
+site_species_matrix = pd.DataFrame(index=hexagons["GRID_ID"].tolist(), columns=species, data=0)
 print(site_species_matrix.head())
 
 # Process rasters.
@@ -53,7 +53,7 @@ for raster_path in rasters_to_process:
             
             # Check if there's any non-zero value in the masked raster
             if np.any(out_image > 0):  # Change condition based on your specific criteria
-                site_species_matrix.at[index, species_name] = 1
+                site_species_matrix.at[hexagon["GRID_ID"][index], species_name] = 1
         
     total_time = time.time() - start_time
     print('Finished processing raster in', round(total_time, 2), 'seconds')
