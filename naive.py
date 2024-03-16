@@ -23,8 +23,8 @@ def process_raster(raster_path, species_name, hexagons):
         # Loop through each hexagon
         count = 0
         for _, hexagon in tqdm(hexagons.iterrows(), total=hexagons.shape[0]):
-            if count > 1_000:
-                break
+            # if count > 1_000:
+            #     break
             # Use the geometry to mask the raster, crop=True reduces the output to the bounding box of the mask
             out_image, out_transform = rasterio.mask.mask(src, [hexagon['geometry']], crop=True, nodata=0)
             
