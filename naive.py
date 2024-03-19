@@ -51,7 +51,7 @@ def main():
     RASTERS = [os.path.join(RASTER_FOLDER, f) for f in os.listdir(RASTER_FOLDER) if f.endswith('.tif')]
     SPECIES_RASTER_MAP = { "_".join(os.path.basename(raster_path).split('.')[0].split('_')[:2]): raster_path for raster_path in RASTERS }
     # Set to None if you want to generate a new matrix instead of updating an existant one.
-    SITE_SPECIES_MATRIX_PATH = None
+    SITE_SPECIES_MATRIX_PATH = 'site_species_matrix.csv'
     # print(rasters_to_process)
 
     # Load the shapefile
@@ -74,15 +74,20 @@ def main():
         site_species_matrix = pd.DataFrame(index=hexagons["GRID_ID"].tolist())
         site_species_matrix.index.name = "GRID_ID"
         species_to_process = [species for species in SPECIES_RASTER_MAP.keys()]
+
+    csv_output_path = 'site_species_matrix.csv'
     
     processing_start = time.time() 
-
-    for species in species_to_process:
+    species_to_process = species_to_process[:500]
+    for i, species in enumerate(species_to_process):
         intersection_info = process_raster(SPECIES_RASTER_MAP[species], species, hexagons)
         update_site_species_matrix(site_species_matrix, intersection_info)
 
+        if i % 10 == 0:
+            print(f"Processed {i} species out of {len(species_to_process)}")
+            site_species_matrix.to_csv(csv_output_path)
+
     processing_total = time.time() - processing_start
-    csv_output_path = 'site_species_matrix_partial_coverage.csv'
     site_species_matrix.to_csv(csv_output_path)
     print(f"Site-species matrix saved to {csv_output_path}")
     print(f"Processing time: {processing_total} seconds")
