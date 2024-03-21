@@ -49,6 +49,7 @@ def main():
     SHAPEFILE_PATH = os.path.join(SHAPEFILE_FOLDER, 'Colombia_grid_20k.shp')
     RASTER_FOLDER = 'bird_maps'
     RASTERS = [os.path.join(RASTER_FOLDER, f) for f in os.listdir(RASTER_FOLDER) if f.endswith('.tif')]
+    print(f"Number of total species rasters: {len(RASTERS)}")
     SPECIES_RASTER_MAP = { "_".join(os.path.basename(raster_path).split('.')[0].split('_')[:2]): raster_path for raster_path in RASTERS }
     # Set to None if you want to generate a new matrix instead of updating an existant one.
     SITE_SPECIES_MATRIX_PATH = 'site_species_matrix.csv'
@@ -76,9 +77,12 @@ def main():
         species_to_process = [species for species in SPECIES_RASTER_MAP.keys()]
 
     csv_output_path = 'site_species_matrix.csv'
+
+    if len(species_to_process) == 0:
+        print("All species have already been processed.")
+        return
     
     processing_start = time.time() 
-    species_to_process = species_to_process[:500]
     for i, species in enumerate(species_to_process):
         intersection_info = process_raster(SPECIES_RASTER_MAP[species], species, hexagons)
         update_site_species_matrix(site_species_matrix, intersection_info)
