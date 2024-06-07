@@ -21,17 +21,13 @@ def process_raster(raster_path, species_name, hexagons):
 
     with rasterio.open(raster_path) as src:
         # Loop through each hexagon
-        count = 0
         for _, hexagon in tqdm(hexagons.iterrows(), total=hexagons.shape[0]):
-            # if count > 1_000:
-            #     break
             # Use the geometry to mask the raster, crop=True reduces the output to the bounding box of the mask
-            out_image, out_transform = rasterio.mask.mask(src, [hexagon['geometry']], crop=True, nodata=0)
+            out_image, _ = rasterio.mask.mask(src, [hexagon['geometry']], crop=True, nodata=0)
             
             # Check if there's any non-zero value in the masked raster
             if np.any(out_image > 0):  # Change condition based on your specific criteria
                 intersection_info["intersecting_hexagons"].append(hexagon["GRID_ID"])
-            count += 1
     return intersection_info
 
 def update_site_species_matrix(site_species_matrix, intersection_info):
